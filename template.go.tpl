@@ -1,10 +1,11 @@
+/* 使用 $. 访问绝对顶层数据域 */
 type {{ $.InterfaceName }} interface {
 {{range .MethodSet}}
 	{{.Name}}(context.Context, *{{.Request}}) (*{{.Reply}}, error)
 {{end}}
 }
 func Register{{ $.InterfaceName }}(r gin.IRouter, srv {{ $.InterfaceName }}) {
-	s := {{.Name}}{
+	s := {{$.Name}}{
 		server: srv,
 		router:     r,
 		resp: default{{$.Name}}Resp{},
@@ -105,6 +106,13 @@ func (s *{{$.Name}}) {{ .HandlerName }} (ctx *gin.Context) {
 		md.Set(k, v...)
 	}
 	newCtx := metadata.NewIncomingContext(ctx, md)
+	// check param
+    if v, ok := interface{}(in).(api.Validator);ok {
+        if err := v.Validate();err != nil {
+            c.AbortWithStatusJSON(400, gin.H{"err": err.Error()})
+            return
+        }
+    }
 	out, err := s.server.({{ $.InterfaceName }}).{{.Name}}(newCtx, &in)
 	if err != nil {
 		s.resp.Error(ctx, err)

@@ -11,6 +11,7 @@ import (
 //go:embed template.go.tpl
 var tpl string
 
+// 服务变量
 type service struct {
 	Name     string // Greeter
 	FullName string // helloworld.Greeter
@@ -20,6 +21,7 @@ type service struct {
 	MethodSet map[string]*method
 }
 
+// service 所有变量及方法都可以在模板文件中使用
 func (s *service) execute() string {
 	if s.MethodSet == nil {
 		s.MethodSet = map[string]*method{}
