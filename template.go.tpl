@@ -4,6 +4,11 @@ type {{ $.InterfaceName }} interface {
 	{{.Name}}(context.Context, *{{.Request}}) (*{{.Reply}}, error)
 {{end}}
 }
+
+type Validator interface {
+    Validate() error
+}
+
 func Register{{ $.InterfaceName }}(r gin.IRouter, srv {{ $.InterfaceName }}) {
 	s := {{$.Name}}{
 		server: srv,
@@ -107,9 +112,9 @@ func (s *{{$.Name}}) {{ .HandlerName }} (ctx *gin.Context) {
 	}
 	newCtx := metadata.NewIncomingContext(ctx, md)
 	// check param
-    if v, ok := interface{}(in).(api.Validator);ok {
+    if v, ok := interface{}(in).(Validator);ok {
         if err := v.Validate();err != nil {
-            c.AbortWithStatusJSON(400, gin.H{"err": err.Error()})
+            s.resp.Error(ctx, err)
             return
         }
     }
