@@ -29,6 +29,7 @@ func (s *service) execute() string {
 		}
 	}
 	buf := new(bytes.Buffer)
+	//创建新的模板
 	tmpl, err := template.New("http").Parse(strings.TrimSpace(tpl))
 	if err != nil {
 		panic(err)
